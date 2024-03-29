@@ -5,11 +5,3 @@
 export function FileExists(arg1) {
   return window['go']['main']['App']['FileExists'](arg1);
 }
-
-export function GetVideoInfo(arg1) {
-  return window['go']['main']['App']['GetVideoInfo'](arg1);
-}
-
-export function Greet(arg1) {
-  return window['go']['main']['App']['Greet'](arg1);
-}

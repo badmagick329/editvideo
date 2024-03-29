@@ -1,125 +1,70 @@
-import { Input } from "./components/ui/input";
 import FileInput from "./components/file-input";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer } from "react";
 import { Button } from "./components/ui/button";
-import { GetVideoInfo } from "@/../wailsjs/go/main/App";
-import {
-  SetParams,
-  DefaultParams,
-  CreateClip,
-} from "@/../wailsjs/go/ffmpeg/FFmpeg";
 import OutputnameInput from "./components/outputname-input";
+import { EventsOn } from "@/../wailsjs/runtime/runtime";
+import {
+  reducerCallback,
+  defaultState,
+  setVideoInfo,
+  createClip,
+} from "@/utils";
+import ErrorDisplay from "./components/error-display";
+import FFmpegParamsInput from "./components/ffmpeg-params-input";
+import OutputDisplay from "./components/output-display";
+import ClipTimeInput from "./components/clip-time-input";
 
 function App() {
-  const [filename, setFilename] = useState<string>("");
-  const [output, setOutput] = useState<string>("Output will be displayed here");
-  const [width, setWidth] = useState<number>(0);
-  const [height, setHeight] = useState<number>(0);
-  const [duration, setDuration] = useState<string>("");
-  const [outputFilename, setOutputFilename] = useState<string>("");
-  const [ffmpegParams, setFfmpegParams] = useState<string>("");
-  const [fileExists, setFileExists] = useState<boolean>(false);
-  const [clipStart, setClipStart] = useState<string>("");
-  const [clipEnd, setClipEnd] = useState<string>("");
-
-  function defaultOutputFilename() {
-    if (!fileExists) return "";
-    let splitName = filename.split(".");
-    let outputFilename = "";
-    for (let i = 0; i < splitName.length - 1; i++) {
-      outputFilename += splitName[i];
-    }
-    outputFilename += "_out.mp4";
-    return outputFilename;
-  }
+  const [state, dispatch] = useReducer(reducerCallback, defaultState);
 
   useEffect(() => {
-    if (!fileExists) return;
-    console.log("width height or duration changed");
-    setOutput(`Width: ${width}. Height: ${height}, Duration: ${duration}s`);
-    setClipStart("0");
-    setClipEnd(duration.toString());
-  }, [fileExists, width, height, duration]);
-
-  useEffect(() => {
-    if (!fileExists) {
-      setOutput("");
-      setFfmpegParams("");
-      setClipStart("");
-      setClipEnd("");
-      setOutputFilename("");
+    if (!state.fileExists) {
+      dispatch({ type: "fileDoesNotExist", payload: null });
       return;
     }
-    (async () => {
-      const [newWidth, newHeight, newDuration] = await GetVideoInfo(filename);
-      const defaultParams = await DefaultParams();
-      console.log("width", newWidth);
-      console.log("height", newHeight);
-      console.log("duration", newDuration);
-      setWidth(parseInt(newWidth));
-      setHeight(parseInt(newHeight));
-      setDuration(newDuration);
-      console.log("updated width height and duration");
-      setFfmpegParams(defaultParams.join(" "));
-    })();
-  }, [fileExists]);
+    setVideoInfo(state.filename, dispatch);
+  }, [state.fileExists]);
 
   useEffect(() => {
-    SetParams(ffmpegParams);
-  }, [ffmpegParams]);
+    EventsOn("ffmpeg-running", (running: boolean) => {
+      dispatch({ type: "setFFmpegRunning", payload: running });
+    });
+    EventsOn("ffmpeg-error", (err: string) => {
+      dispatch({ type: "setError", payload: err });
+    });
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col items-center gap-4 bg-[#0e0e0e] text-white justify-center">
-      <FileInput
-        filename={filename}
-        setFilename={setFilename}
-        fileExists={fileExists}
-        setFileExists={setFileExists}
-      />
-      <span>{output}</span>
+      <FileInput state={state} dispatch={dispatch} />
+      <OutputDisplay state={state} dispatch={dispatch} />
+      <ErrorDisplay state={state} dispatch={dispatch} />
       <div className="flex w-full flex-col items-center gap-2">
-        <label>FFmpeg Params</label>
-        <Input
-          value={ffmpegParams}
-          onChange={(e) => setFfmpegParams(e.target.value)}
-          className="w-full max-w-lg"
-          disabled={!fileExists}
-          placeholder="FFmpeg Params"
-        />
-        <OutputnameInput
-          outputFilename={outputFilename}
-          setOutputFilename={setOutputFilename}
-          defaultOutputFilename={defaultOutputFilename}
-          fileExists={fileExists}
-        />
+        <FFmpegParamsInput state={state} dispatch={dispatch} />
+        <OutputnameInput state={state} dispatch={dispatch} />
       </div>
       <div className="flex w-full max-w-lg items-center justify-center gap-4">
-        <Input
+        <ClipTimeInput
+          value={state.clipStart}
+          onChange={(e) =>
+            dispatch({ type: "setClipStart", payload: e.target.value })
+          }
+          disabled={!state.fileExists || state.ffmpegRunning}
           placeholder="Clip start time"
-          value={clipStart}
-          onChange={(e) => setClipStart(e.target.value)}
-          disabled={!fileExists}
         />
-        <Input
+        <ClipTimeInput
+          value={state.clipEnd}
+          onChange={(e) =>
+            dispatch({ type: "setClipEnd", payload: e.target.value })
+          }
+          disabled={!state.fileExists || state.ffmpegRunning}
           placeholder="Clip end time"
-          value={clipEnd}
-          onChange={(e) => setClipEnd(e.target.value)}
-          disabled={!fileExists}
         />
         <Button
-          onClick={async () => {
-            console.log("clip start", clipStart);
-            console.log("clip end", clipEnd);
-            console.log("filename", filename);
-            const out = outputFilename || defaultOutputFilename();
-            console.log("outputFilename", out);
-            await CreateClip(filename, out, clipStart, clipEnd);
-            // const res = await ClipVideo(filename, clipStart, clipEnd);
-            // setOutput(res);
-          }}
-          disabled={!fileExists}
+          onClick={() => createClip(state)}
+          disabled={!state.fileExists || state.ffmpegRunning}
         >
-          Clip
+          {state.ffmpegRunning ? "Running" : "Clip"}
         </Button>
       </div>
     </div>

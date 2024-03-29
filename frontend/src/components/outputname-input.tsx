@@ -1,17 +1,17 @@
 import { Input } from "./ui/input";
+import { Action, State } from "@/types";
+import { defaultOutputFilename } from "@/utils";
 
 export default function OutputnameInput({
-  outputFilename,
-  setOutputFilename,
-  defaultOutputFilename,
-  fileExists,
+  state,
+  dispatch,
 }: {
-  outputFilename: string;
-  setOutputFilename: (outputFilename: string) => void;
-  defaultOutputFilename: () => string;
-  fileExists: boolean;
+  state: State;
+  dispatch: React.Dispatch<Action>;
 }) {
-  const showComponent = !outputFilename.trim() && defaultOutputFilename();
+  const showComponent =
+    !state.outputFilename.trim() &&
+    defaultOutputFilename(state.filename, state.fileExists);
   const style = showComponent
     ? "flex w-full gap-2 border-2 rounded-md p-2"
     : "";
@@ -21,13 +21,19 @@ export default function OutputnameInput({
         <span className="font-black">
           {showComponent && "Default output filename:"}
         </span>
-        <span>{showComponent ? `${defaultOutputFilename()}` : ""}</span>
+        <span>
+          {showComponent
+            ? `${defaultOutputFilename(state.filename, state.fileExists)}`
+            : ""}
+        </span>
       </div>
       <Input
-        value={outputFilename}
-        onChange={(e) => setOutputFilename(e.target.value)}
+        value={state.outputFilename}
+        onChange={(e) =>
+          dispatch({ type: "setOutputFilename", payload: e.target.value })
+        }
         className="w-full max-w-lg"
-        disabled={!fileExists}
+        disabled={!state.fileExists}
         placeholder="Output filename"
       />
     </div>

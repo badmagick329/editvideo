@@ -14,6 +14,10 @@ export function GetParams() {
   return window['go']['ffmpeg']['FFmpeg']['GetParams']();
 }
 
+export function GetVideoInfo(arg1) {
+  return window['go']['ffmpeg']['FFmpeg']['GetVideoInfo'](arg1);
+}
+
 export function SetParams(arg1) {
   return window['go']['ffmpeg']['FFmpeg']['SetParams'](arg1);
 }

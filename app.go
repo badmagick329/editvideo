@@ -2,12 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
-	"os/exec"
-	"strings"
-
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // App struct
@@ -43,24 +38,7 @@ func (a *App) shutdown(ctx context.Context) {
 	// Perform your teardown here
 }
 
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
-}
-
 func (a *App) FileExists(path string) bool {
 	_, err := os.Stat(path)
 	return !os.IsNotExist(err)
-}
-
-func (a *App) GetVideoInfo(vidfile string) ([]string, error) {
-	runtime.LogDebug(a.ctx, "Getting dimensions for: "+vidfile)
-	out, err := exec.Command("ffprobe", "-v", "error", "-show_entries",
-		"stream=width,height,duration", "-of",
-		"default=noprint_wrappers=1:nokey=1", vidfile).Output()
-	data := strings.Split(string(out), "\n")
-	if err != nil {
-		return nil, err
-	}
-	return data, nil
 }
