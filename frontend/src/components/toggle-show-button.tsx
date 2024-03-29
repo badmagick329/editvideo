@@ -11,6 +11,8 @@ export default function ToggleShowButton({
   return (
     <Button
       size="lg"
+      variant="outline"
+      className="bg-[#2d2d2d] text-white hover:bg-[#1a1a1a] hover:text-white"
       onClick={() => {
         dispatch({
           type: "toggleShowInputs",

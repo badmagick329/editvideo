@@ -2,6 +2,7 @@ import { Input } from "./ui/input";
 import { FileExists } from "@/../wailsjs/go/main/App";
 import { Action, State } from "@/types";
 import { useEffect } from "react";
+import InputWithLabel from "@/components/input-with-label";
 
 export default function FileInput({
   state,
@@ -18,18 +19,15 @@ export default function FileInput({
   }, [state.filename]);
 
   return (
-    <div className="flex gap-4 items-center w-full max-w-lg">
-      <Input
-        placeholder="Enter video filepath"
-        value={state.filename}
-        onChange={(e) =>
-          dispatch({ type: "setFilename", payload: e.target.value })
-        }
-        className="w-2/3"
-      />
-      <span className="w-1/3 text-lg">
-        {state.fileExists ? "File found ✅" : ""}
-      </span>
-    </div>
+    <InputWithLabel
+      label={state.fileExists ? "Video file ✅" : "Enter video filepath"}
+      value={state.filename}
+      onChange={(e) =>
+        dispatch({ type: "setFilename", payload: e.target.value })
+      }
+      disabled={state.ffmpegRunning}
+      placeholder="Enter video filepath"
+      type="text"
+    />
   );
 }

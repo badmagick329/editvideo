@@ -15,7 +15,7 @@ export default function ClipComponent({
   }
 
   return (
-    <div className="flex w-full max-w-lg items-end justify-center gap-4">
+    <div className="flex w-full max-w-lg flex-col items-center gap-4">
       <InputWithLabel
         label="Clip start"
         value={state.clipStart}

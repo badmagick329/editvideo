@@ -29,12 +29,12 @@ func main() {
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:             "edit-video",
-		Width:             1024,
-		Height:            768,
-		MinWidth:          1024,
-		MinHeight:         768,
-		MaxWidth:          1280,
-		MaxHeight:         800,
+		Width:             610,
+		Height:            700,
+		MinWidth:          610,
+		MinHeight:         700,
+		MaxWidth:          610,
+		MaxHeight:         700,
 		DisableResize:     false,
 		Fullscreen:        false,
 		Frameless:         false,

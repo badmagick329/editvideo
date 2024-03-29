@@ -17,7 +17,7 @@ export default function InputWithLabel({
   type: string;
 }) {
   return (
-    <div className="flex w-full max-w-lg flex-col space-y-1">
+    <div className="flex w-full max-w-lg flex-col space-y-1 gap-1">
       <Label htmlFor={label}>{label}</Label>
       <Input
         placeholder={placeholder}

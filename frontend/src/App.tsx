@@ -32,18 +32,20 @@ function App() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col items-center gap-4 bg-[#0e0e0e] pt-6 text-white">
+    <div className="flex min-h-screen flex-col items-center gap-4 bg-[#0e0e0e] pt-6 text-white gap-2">
       <FileInput state={state} dispatch={dispatch} />
       <OutputDisplay state={state} dispatch={dispatch} />
       <ErrorDisplay state={state} dispatch={dispatch} />
-      <div className="flex w-full flex-col items-center gap-2">
+      <div className="flex w-full flex-col items-center gap-4">
         <FFmpegParamsInput state={state} dispatch={dispatch} />
         <OutputnameInput state={state} dispatch={dispatch} />
       </div>
-      <div className="flex w-[32rem] flex-col items-center gap-4">
+      <div className="flex w-[32rem] flex-col items-center gap-4 py-4 px-2 rounded-md border-2">
         <ToggleShowButton
           dispatch={dispatch}
-          text={state.showClipInputs ? "Crop Video" : "Clip Video"}
+          text={
+            state.showClipInputs ? "Switch to crop view" : "Switch to clip view"
+          }
         />
         <ClipComponent state={state} dispatch={dispatch} />
         <CropComponent state={state} dispatch={dispatch} />
