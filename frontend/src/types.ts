@@ -11,6 +11,12 @@ export type State = {
   clipEnd: string;
   ffmpegRunning: boolean;
   error: string;
+  showClipInputs: boolean;
+  showCropInputs: boolean;
+  cropX: number | null;
+  cropY: number | null;
+  cropWidth: number | null;
+  cropHeight: number | null;
 };
 
 export type Action = {
@@ -31,6 +37,11 @@ const actions = [
   "setClipEnd",
   "setFFmpegRunning",
   "setError",
+  "toggleShowInputs",
+  "setCropX",
+  "setCropY",
+  "setCropWidth",
+  "setCropHeight",
   "fileDoesNotExist",
   "setVideoInfo",
 ];

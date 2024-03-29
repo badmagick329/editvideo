@@ -1,5 +1,5 @@
-import { Input } from "@/components/ui/input";
 import { Action, State } from "@/types";
+import InputWithLabel from "@/components/input-with-label";
 
 export default function FFmpegParamsInput({
   state,
@@ -9,17 +9,15 @@ export default function FFmpegParamsInput({
   dispatch: React.Dispatch<Action>;
 }) {
   return (
-    <>
-      <label>FFmpeg Params</label>
-      <Input
-        value={state.ffmpegParams}
-        onChange={(e) => {
-          dispatch({ type: "setFFmpegParams", payload: e.target.value });
-        }}
-        className="w-full max-w-lg"
-        disabled={!state.fileExists}
-        placeholder="FFmpeg Params"
-      />
-    </>
+    <InputWithLabel
+      label="FFmpeg Params"
+      value={state.ffmpegParams}
+      onChange={(e) => {
+        dispatch({ type: "setFFmpegParams", payload: e.target.value });
+      }}
+      disabled={!state.fileExists}
+      placeholder="FFmpeg Params"
+      type="text"
+    />
   );
 }

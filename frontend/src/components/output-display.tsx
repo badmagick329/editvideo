@@ -19,5 +19,9 @@ export default function OutputDisplay({
     });
   }, [state.fileExists, state.width, state.height, state.duration]);
 
-  return <span>{state.output}</span>;
+  return (
+    <span className="font-semibold">
+      {state.output ? state.output : "Waiting for video filename"}
+    </span>
+  );
 }

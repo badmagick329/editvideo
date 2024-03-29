@@ -9,13 +9,19 @@ export default function ErrorDisplay({
   dispatch: React.Dispatch<Action>;
 }) {
   useEffect(() => {
-    dispatch({ type: "setError", payload: "" });
+    if (state.error) {
+      dispatch({ type: "setError", payload: "" });
+    }
   }, [
     state.ffmpegParams,
     state.filename,
     state.outputFilename,
     state.clipStart,
     state.clipEnd,
+    state.cropX,
+    state.cropY,
+    state.cropWidth,
+    state.cropHeight,
   ]);
 
   return <span className="text-red-600">{state.error}</span>;

@@ -1,18 +1,14 @@
-import FileInput from "./components/file-input";
+import FileInput from "@/components/file-input";
 import { useEffect, useReducer } from "react";
-import { Button } from "./components/ui/button";
-import OutputnameInput from "./components/outputname-input";
+import OutputnameInput from "@/components/outputname-input";
 import { EventsOn } from "@/../wailsjs/runtime/runtime";
-import {
-  reducerCallback,
-  defaultState,
-  setVideoInfo,
-  createClip,
-} from "@/utils";
-import ErrorDisplay from "./components/error-display";
-import FFmpegParamsInput from "./components/ffmpeg-params-input";
-import OutputDisplay from "./components/output-display";
-import ClipTimeInput from "./components/clip-time-input";
+import { reducerCallback, defaultState, setVideoInfo } from "@/utils";
+import ErrorDisplay from "@/components/error-display";
+import FFmpegParamsInput from "@/components/ffmpeg-params-input";
+import OutputDisplay from "@/components/output-display";
+import ClipComponent from "@/components/clip-component";
+import CropComponent from "@/components/crop-component";
+import ToggleShowButton from "@/components/toggle-show-button";
 
 function App() {
   const [state, dispatch] = useReducer(reducerCallback, defaultState);
@@ -30,12 +26,13 @@ function App() {
       dispatch({ type: "setFFmpegRunning", payload: running });
     });
     EventsOn("ffmpeg-error", (err: string) => {
-      dispatch({ type: "setError", payload: err });
+      const error = `Error running ffmpeg: ${err}`;
+      dispatch({ type: "setError", payload: error });
     });
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col items-center gap-4 bg-[#0e0e0e] text-white justify-center">
+    <div className="flex min-h-screen flex-col items-center gap-4 bg-[#0e0e0e] pt-6 text-white">
       <FileInput state={state} dispatch={dispatch} />
       <OutputDisplay state={state} dispatch={dispatch} />
       <ErrorDisplay state={state} dispatch={dispatch} />
@@ -43,29 +40,13 @@ function App() {
         <FFmpegParamsInput state={state} dispatch={dispatch} />
         <OutputnameInput state={state} dispatch={dispatch} />
       </div>
-      <div className="flex w-full max-w-lg items-center justify-center gap-4">
-        <ClipTimeInput
-          value={state.clipStart}
-          onChange={(e) =>
-            dispatch({ type: "setClipStart", payload: e.target.value })
-          }
-          disabled={!state.fileExists || state.ffmpegRunning}
-          placeholder="Clip start time"
+      <div className="flex w-[32rem] flex-col items-center gap-4">
+        <ToggleShowButton
+          dispatch={dispatch}
+          text={state.showClipInputs ? "Crop Video" : "Clip Video"}
         />
-        <ClipTimeInput
-          value={state.clipEnd}
-          onChange={(e) =>
-            dispatch({ type: "setClipEnd", payload: e.target.value })
-          }
-          disabled={!state.fileExists || state.ffmpegRunning}
-          placeholder="Clip end time"
-        />
-        <Button
-          onClick={() => createClip(state)}
-          disabled={!state.fileExists || state.ffmpegRunning}
-        >
-          {state.ffmpegRunning ? "Running" : "Clip"}
-        </Button>
+        <ClipComponent state={state} dispatch={dispatch} />
+        <CropComponent state={state} dispatch={dispatch} />
       </div>
     </div>
   );

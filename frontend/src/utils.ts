@@ -32,6 +32,20 @@ export function reducerCallback(state: State, action: Action) {
       return { ...state, ffmpegRunning: action.payload };
     case "setError":
       return { ...state, error: action.payload };
+    case "toggleShowInputs":
+      return {
+        ...state,
+        showClipInputs: !state.showClipInputs,
+        showCropInputs: !state.showCropInputs,
+      };
+    case "setCropX":
+      return { ...state, cropX: action.payload };
+    case "setCropY":
+      return { ...state, cropY: action.payload };
+    case "setCropWidth":
+      return { ...state, cropWidth: action.payload };
+    case "setCropHeight":
+      return { ...state, cropHeight: action.payload };
     case "fileDoesNotExist":
       return {
         ...state,
@@ -75,20 +89,31 @@ export const defaultState: State = {
   clipEnd: "",
   ffmpegRunning: false,
   error: "",
+  showClipInputs: false,
+  showCropInputs: true,
+  cropX: null,
+  cropY: null,
+  cropWidth: null,
+  cropHeight: null,
 };
 
 export async function setVideoInfo(
   filename: string,
   dispatch: React.Dispatch<Action>,
 ) {
-  const [newWidth, newHeight, newDuration] = await GetVideoInfo(filename);
+  const videoInfo = await GetVideoInfo(filename);
   const defaultParams = await DefaultParams();
-  const width = parseInt(newWidth) || 0;
-  const height = parseInt(newHeight) || 0;
+  const width = videoInfo.Width;
+  const height = videoInfo.Height;
   const ffmpegParams = defaultParams.join(" ");
   dispatch({
     type: "setVideoInfo",
-    payload: { width, height, duration: newDuration, ffmpegParams },
+    payload: {
+      width,
+      height,
+      duration: videoInfo.Duration.toString(),
+      ffmpegParams,
+    },
   });
 }
 

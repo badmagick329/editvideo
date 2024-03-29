@@ -37,20 +37,22 @@ func (f *FFmpeg) GetParams() []string {
 }
 
 func (f *FFmpeg) DefaultParams() []string {
-	return []string{"-c:v", "libx264", "-crf", "14"}
+	return []string{
+		"-c:v",
+		"libx264",
+		"-crf",
+		"17",
+		"-preset",
+		"ultrafast",
+	}
 }
 
-func (f *FFmpeg) GetVideoInfo(vidfile string) ([3]string, error) {
+func (f *FFmpeg) GetVideoInfo(vidfile string) (VideoInfo, error) {
 	info, err := ProbeFile(vidfile)
 	if err != nil {
-		return [3]string{}, err
+		return VideoInfo{}, fmt.Errorf("Error probing file: %s", err)
 	}
-	data := [3]string{
-		fmt.Sprintf("%d", info.Width),
-		fmt.Sprintf("%d", info.Height),
-		fmt.Sprintf("%f", info.Duration),
-	}
-	return data, nil
+	return info, nil
 }
 
 func (f *FFmpeg) CreateClip(inputFile string, outputFile string, start string, end string) error {

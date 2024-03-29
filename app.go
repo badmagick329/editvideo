@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"os"
+	"path/filepath"
+	"slices"
 )
 
 // App struct
@@ -40,5 +42,27 @@ func (a *App) shutdown(ctx context.Context) {
 
 func (a *App) FileExists(path string) bool {
 	_, err := os.Stat(path)
-	return !os.IsNotExist(err)
+	if os.IsNotExist(err) {
+		return false
+	}
+	validVideoExtensions := []string{
+		".mp4",
+		".webm",
+		".mkv",
+		".avi",
+		".mov",
+		".flv",
+		".wmv",
+		".mpg",
+		".mpeg",
+		".m4v",
+		".3gp",
+		".3g2",
+		".ts",
+		".mts",
+		".m2ts",
+		".vob",
+	}
+	ext := filepath.Ext(path)
+	return slices.Contains(validVideoExtensions, ext)
 }
