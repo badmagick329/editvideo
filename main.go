@@ -10,7 +10,8 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
-	// "github.com/wailsapp/wails/v2/pkg/runtime"
+
+	"edit-video/ffmpeg"
 )
 
 //go:embed all:frontend/dist
@@ -22,6 +23,7 @@ var icon []byte
 func main() {
 	// Create an instance of the app structure
 	app := NewApp()
+	ffmpeg := ffmpeg.NewFFmpeg(&app.ctx)
 	// runtime.EventsOn("file-exists", app.fileExists)
 
 	// Create application with options
@@ -52,6 +54,7 @@ func main() {
 		WindowStartState: options.Normal,
 		Bind: []interface{}{
 			app,
+			ffmpeg,
 		},
 		// Windows platform specific options
 		Windows: &windows.Options{

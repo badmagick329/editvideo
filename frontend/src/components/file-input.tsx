@@ -21,7 +21,7 @@ export default function FileInput({
   }, [filename]);
 
   return (
-    <div className="flex pt-6 gap-4 items-center w-full max-w-lg">
+    <div className="flex gap-4 items-center w-full max-w-lg">
       <Input
         placeholder="Enter video filepath"
         value={filename}

@@ -1,4 +1,4 @@
-module changeme
+module edit-video
 
 go 1.21
 

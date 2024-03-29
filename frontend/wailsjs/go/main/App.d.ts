@@ -3,6 +3,6 @@
 
 export function FileExists(arg1:string):Promise<boolean>;
 
-export function GetDimensions(arg1:string):Promise<string>;
+export function GetVideoInfo(arg1:string):Promise<Array<string>>;
 
 export function Greet(arg1:string):Promise<string>;

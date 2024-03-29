@@ -53,17 +53,14 @@ func (a *App) FileExists(path string) bool {
 	return !os.IsNotExist(err)
 }
 
-func (a *App) GetDimensions(vidfile string) (string, error) {
+func (a *App) GetVideoInfo(vidfile string) ([]string, error) {
 	runtime.LogDebug(a.ctx, "Getting dimensions for: "+vidfile)
 	out, err := exec.Command("ffprobe", "-v", "error", "-show_entries",
 		"stream=width,height,duration", "-of",
 		"default=noprint_wrappers=1:nokey=1", vidfile).Output()
 	data := strings.Split(string(out), "\n")
-	dimensions := strings.Join(data[:2], "x")
-	duration := strings.Replace(data[2], "\n", "", 1)
-	output := "WidthxHeight: " + dimensions + " " + "Duration: " + duration + "s"
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return output, nil
+	return data, nil
 }
