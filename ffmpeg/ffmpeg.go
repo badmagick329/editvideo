@@ -2,6 +2,7 @@ package ffmpeg
 
 import (
 	"context"
+	"fmt"
 	"os/exec"
 	"strings"
 
@@ -39,37 +40,37 @@ func (f *FFmpeg) DefaultParams() []string {
 	return []string{"-c:v", "libx264", "-crf", "14"}
 }
 
-func (f *FFmpeg) GetVideoInfo(vidfile string) ([]string, error) {
-	runtime.LogDebug(*f.ctx, "Getting dimensions for: "+vidfile)
-	out, err := exec.Command("ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
-		"stream=width,height,duration", "-of",
-		"default=nw=1:nk=1", vidfile).Output()
-	data := strings.Split(string(out), "\n")
-	runtime.LogDebug(*f.ctx, "Data: "+strings.Join(data, ","))
+func (f *FFmpeg) GetVideoInfo(vidfile string) ([3]string, error) {
+	info, err := ProbeFile(vidfile)
 	if err != nil {
-		return nil, err
+		return [3]string{}, err
+	}
+	data := [3]string{
+		fmt.Sprintf("%d", info.Width),
+		fmt.Sprintf("%d", info.Height),
+		fmt.Sprintf("%f", info.Duration),
 	}
 	return data, nil
 }
 
 func (f *FFmpeg) CreateClip(inputFile string, outputFile string, start string, end string) error {
 	params := f.GetParams()
-	cmd_without_params := []string{"-y", "-i", inputFile, "-ss", start, "-to", end, outputFile}
+	withoutParams := []string{"-y", "-i", inputFile, "-ss", start, "-to", end, outputFile}
 
-	runtime.LogDebug(*f.ctx, "ffmpeg "+strings.Join(cmd_without_params, " "))
-	cmd := make([]string, 0, len(cmd_without_params)+len(params))
-	cmd = append(cmd, cmd_without_params[:len(cmd_without_params)-1]...)
-	cmd = append(cmd, params...)
-	cmd = append(cmd, cmd_without_params[len(cmd_without_params)-1:]...)
-	runtime.LogDebug(*f.ctx, "Running ffmpeg "+strings.Join(cmd, " "))
+	runtime.LogDebug(*f.ctx, "ffmpeg "+strings.Join(withoutParams, " "))
+	runCmd := make([]string, 0, len(withoutParams)+len(params))
+	runCmd = append(runCmd, withoutParams[:len(withoutParams)-1]...)
+	runCmd = append(runCmd, params...)
+	runCmd = append(runCmd, withoutParams[len(withoutParams)-1:]...)
+	runtime.LogDebug(*f.ctx, "Running ffmpeg "+strings.Join(runCmd, " "))
 	go func() {
 		runtime.EventsEmit(*f.ctx, "ffmpeg-running", true)
-		out, err := exec.Command("ffmpeg", cmd...).Output()
+		cmd := exec.Command("ffmpeg", runCmd...)
+		out, err := cmd.CombinedOutput()
 		if err != nil {
 			runtime.LogError(*f.ctx, "Error running ffmpeg: "+string(out))
-			runtime.EventsEmit(*f.ctx, "ffmpeg-error", strings.Join(cmd, " "))
+			runtime.EventsEmit(*f.ctx, "ffmpeg-error", strings.Join(runCmd, " "))
 		}
-		runtime.LogDebug(*f.ctx, "ffmpeg completed")
 		runtime.EventsEmit(*f.ctx, "ffmpeg-running", false)
 	}()
 	return nil

@@ -7,6 +7,6 @@ export function DefaultParams():Promise<Array<string>>;
 
 export function GetParams():Promise<Array<string>>;
 
-export function GetVideoInfo(arg1:string):Promise<Array<string>>;
+export function GetVideoInfo(arg1:string):Promise<any>;
 
 export function SetParams(arg1:string):Promise<void>;
