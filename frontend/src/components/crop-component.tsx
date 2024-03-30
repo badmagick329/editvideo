@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { State, Action } from "@/types";
 import InputWithLabel from "@/components/input-with-label";
+import { CreateCrop, PreviewCrop } from "@/../wailsjs/go/ffmpeg/FFmpeg";
+import { defaultOutputFilename } from "@/utils";
 
 export default function CropComponent({
   state,
@@ -65,10 +67,38 @@ export default function CropComponent({
       </div>
 
       <div className="flex w-full max-w-lg items-center justify-center gap-4">
-        <Button disabled={!state.fileExists || state.ffmpegRunning}>
+        <Button
+          disabled={!state.fileExists || state.ffmpegRunning}
+          onClick={() => {
+            const cropX = (state.cropX || 0).toString();
+            const cropY = (state.cropY || 0).toString();
+            const cropWidth = (state.cropWidth || state.width).toString();
+            const cropHeight = (state.cropHeight || state.height).toString();
+            PreviewCrop(cropWidth, cropHeight, cropX, cropY, state.filename);
+          }}
+        >
           Preview
         </Button>
-        <Button disabled={!state.fileExists || state.ffmpegRunning}>
+        <Button
+          disabled={!state.fileExists || state.ffmpegRunning}
+          onClick={() => {
+            const out =
+              state.outputFilename ||
+              defaultOutputFilename(state.filename, state.fileExists);
+            const cropX = (state.cropX || 0).toString();
+            const cropY = (state.cropY || 0).toString();
+            const cropWidth = (state.cropWidth || state.width).toString();
+            const cropHeight = (state.cropHeight || state.height).toString();
+            CreateCrop(
+              state.filename,
+              out,
+              cropWidth,
+              cropHeight,
+              cropX,
+              cropY,
+            );
+          }}
+        >
           {state.ffmpegRunning ? "Running" : "Crop"}
         </Button>
       </div>

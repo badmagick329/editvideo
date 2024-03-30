@@ -26,13 +26,12 @@ function App() {
       dispatch({ type: "setFFmpegRunning", payload: running });
     });
     EventsOn("ffmpeg-error", (err: string) => {
-      const error = `Error running ffmpeg: ${err}`;
-      dispatch({ type: "setError", payload: error });
+      dispatch({ type: "setError", payload: err });
     });
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col items-center gap-4 bg-[#0e0e0e] pt-6 text-white gap-2">
+    <div className="flex min-h-screen flex-col items-center gap-4 bg-[#0e0e0e] justify-center text-white">
       <FileInput state={state} dispatch={dispatch} />
       <OutputDisplay state={state} dispatch={dispatch} />
       <ErrorDisplay state={state} dispatch={dispatch} />

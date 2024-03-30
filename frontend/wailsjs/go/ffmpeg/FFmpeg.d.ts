@@ -4,10 +4,14 @@ import {ffmpeg} from '../models';
 
 export function CreateClip(arg1:string,arg2:string,arg3:string,arg4:string):Promise<void>;
 
+export function CreateCrop(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string,arg6:string):Promise<void>;
+
 export function DefaultParams():Promise<Array<string>>;
 
 export function GetParams():Promise<Array<string>>;
 
 export function GetVideoInfo(arg1:string):Promise<ffmpeg.VideoInfo>;
+
+export function PreviewCrop(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string):Promise<void>;
 
 export function SetParams(arg1:string):Promise<void>;

@@ -6,6 +6,10 @@ export function CreateClip(arg1, arg2, arg3, arg4) {
   return window['go']['ffmpeg']['FFmpeg']['CreateClip'](arg1, arg2, arg3, arg4);
 }
 
+export function CreateCrop(arg1, arg2, arg3, arg4, arg5, arg6) {
+  return window['go']['ffmpeg']['FFmpeg']['CreateCrop'](arg1, arg2, arg3, arg4, arg5, arg6);
+}
+
 export function DefaultParams() {
   return window['go']['ffmpeg']['FFmpeg']['DefaultParams']();
 }
@@ -16,6 +20,10 @@ export function GetParams() {
 
 export function GetVideoInfo(arg1) {
   return window['go']['ffmpeg']['FFmpeg']['GetVideoInfo'](arg1);
+}
+
+export function PreviewCrop(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['ffmpeg']['FFmpeg']['PreviewCrop'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function SetParams(arg1) {

@@ -1,4 +1,3 @@
-import { Input } from "./ui/input";
 import { FileExists } from "@/../wailsjs/go/main/App";
 import { Action, State } from "@/types";
 import { useEffect } from "react";

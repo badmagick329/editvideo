@@ -71,7 +71,67 @@ func (f *FFmpeg) CreateClip(inputFile string, outputFile string, start string, e
 		out, err := cmd.CombinedOutput()
 		if err != nil {
 			runtime.LogError(*f.ctx, "Error running ffmpeg: "+string(out))
-			runtime.EventsEmit(*f.ctx, "ffmpeg-error", strings.Join(runCmd, " "))
+			runtime.EventsEmit(
+				*f.ctx,
+				"ffmpeg-error",
+				"Error running ffmpeg "+strings.Join(runCmd, " "),
+			)
+		}
+		runtime.EventsEmit(*f.ctx, "ffmpeg-running", false)
+	}()
+	return nil
+}
+
+func (f *FFmpeg) PreviewCrop(w, h, x, y, videoFile string) error {
+	cropString := "crop=" + w + ":" + h + ":" + x + ":" + y
+	go func() {
+		ffplayCmd := []string{"-loop", "0", "-vf", cropString, "-an", videoFile}
+		runtime.EventsEmit(*f.ctx, "ffmpeg-running", true)
+		fmt.Println("ffplay " + strings.Join(ffplayCmd, " "))
+		cmd := exec.Command("ffplay", ffplayCmd...)
+		err := cmd.Run()
+		if err != nil {
+			fmt.Println("Error running ffplay " + err.Error())
+			runtime.EventsEmit(
+				*f.ctx,
+				"ffmpeg-error",
+				"Error running ffplay "+strings.Join(ffplayCmd, " "),
+			)
+		}
+		fmt.Println("No error")
+		runtime.EventsEmit(*f.ctx, "ffmpeg-running", false)
+	}()
+	return nil
+}
+
+func (f *FFmpeg) CreateCrop(inputFile string, outputFile string, w, h, x, y string) error {
+	params := f.GetParams()
+	withoutParams := []string{
+		"-y",
+		"-i",
+		inputFile,
+		"-vf",
+		"crop=" + w + ":" + h + ":" + x + ":" + y,
+		outputFile,
+	}
+
+	runtime.LogDebug(*f.ctx, "ffmpeg "+strings.Join(withoutParams, " "))
+	runCmd := make([]string, 0, len(withoutParams)+len(params))
+	runCmd = append(runCmd, withoutParams[:len(withoutParams)-3]...)
+	runCmd = append(runCmd, params...)
+	runCmd = append(runCmd, withoutParams[len(withoutParams)-3:]...)
+	runtime.LogDebug(*f.ctx, "Running ffmpeg "+strings.Join(runCmd, " "))
+	go func() {
+		runtime.EventsEmit(*f.ctx, "ffmpeg-running", true)
+		cmd := exec.Command("ffmpeg", runCmd...)
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			runtime.LogError(*f.ctx, "Error running ffmpeg "+string(out))
+			runtime.EventsEmit(
+				*f.ctx,
+				"ffmpeg-error",
+				"Error running ffmpeg "+strings.Join(runCmd, " "),
+			)
 		}
 		runtime.EventsEmit(*f.ctx, "ffmpeg-running", false)
 	}()
