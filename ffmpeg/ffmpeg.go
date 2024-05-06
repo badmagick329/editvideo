@@ -55,7 +55,7 @@ func (f *FFmpeg) GetVideoInfo(vidfile string) (VideoInfo, error) {
 	return info, nil
 }
 
-func (f *FFmpeg) CreateClip(inputFile string, outputFile string, start string, end string) error {
+func (f *FFmpeg) CreateClip(inputFile, outputFile, start, end string) error {
 	params := f.GetParams()
 	withoutParams := []string{"-y", "-i", inputFile, "-ss", start, "-to", end, outputFile}
 
@@ -104,7 +104,7 @@ func (f *FFmpeg) PreviewCrop(w, h, x, y, videoFile string) error {
 	return nil
 }
 
-func (f *FFmpeg) CreateCrop(inputFile string, outputFile string, w, h, x, y string) error {
+func (f *FFmpeg) CreateCrop(inputFile, outputFile, w, h, x, y string) error {
 	params := f.GetParams()
 	withoutParams := []string{
 		"-y",
