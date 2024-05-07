@@ -17,6 +17,8 @@ export type State = {
   cropY: number | null;
   cropWidth: number | null;
   cropHeight: number | null;
+  cropClipStart: string;
+  cropClipEnd: string;
 };
 
 export type Action = {
@@ -44,6 +46,8 @@ const actions = [
   "setCropHeight",
   "fileDoesNotExist",
   "setVideoInfo",
+  "setCropClipStart",
+  "setCropClipEnd",
 ];
 
 export type ActionType = (typeof actions)[number];

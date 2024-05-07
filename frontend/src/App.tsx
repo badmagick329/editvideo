@@ -31,7 +31,7 @@ function App() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col items-center gap-4 bg-[#0e0e0e] justify-center text-white">
+    <div className="flex min-h-screen flex-col items-center gap-4 bg-[#0e0e0e] justify-start text-white py-4">
       <FileInput state={state} dispatch={dispatch} />
       <OutputDisplay state={state} dispatch={dispatch} />
       <ErrorDisplay state={state} dispatch={dispatch} />

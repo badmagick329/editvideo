@@ -71,6 +71,10 @@ export function reducerCallback(state: State, action: Action) {
         clipStart: action.payload.clipStart,
         clipEnd: action.payload.clipEnd,
       };
+    case "setCropClipStart":
+      return { ...state, cropClipStart: action.payload };
+    case "setCropClipEnd":
+      return { ...state, cropClipEnd: action.payload };
     default:
       return state;
   }
@@ -95,6 +99,8 @@ export const defaultState: State = {
   cropY: null,
   cropWidth: null,
   cropHeight: null,
+  cropClipStart: "",
+  cropClipEnd: "",
 };
 
 export async function setVideoInfo(
@@ -133,5 +139,11 @@ export async function createClip(state: State) {
     state.outputFilename ||
     defaultOutputFilename(state.filename, state.fileExists);
   SetParams(state.ffmpegParams);
-  await CreateClip(state.filename, out, state.clipStart, state.clipEnd);
+  await CreateClip(
+    state.filename,
+    out,
+    state.clipStart,
+    state.clipEnd,
+    state.ffmpegParams,
+  );
 }

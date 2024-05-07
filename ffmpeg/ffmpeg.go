@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+
+	"edit-video/internal"
 )
 
 type FFmpeg struct {
@@ -55,11 +57,11 @@ func (f *FFmpeg) GetVideoInfo(vidfile string) (VideoInfo, error) {
 	return info, nil
 }
 
-func (f *FFmpeg) CreateClip(inputFile, outputFile, start, end string) error {
-	params := f.GetParams()
+func (f *FFmpeg) CreateClip(inputFile, outputFile, start, end, ffmpegParams string) error {
+	params := strings.Split(ffmpegParams, " ")
 	withoutParams := []string{"-y", "-i", inputFile, "-ss", start, "-to", end, outputFile}
 
-	runtime.LogDebug(*f.ctx, "ffmpeg "+strings.Join(withoutParams, " "))
+	runtime.LogDebug(*f.ctx, "without params: ffmpeg "+strings.Join(withoutParams, " "))
 	runCmd := make([]string, 0, len(withoutParams)+len(params))
 	runCmd = append(runCmd, withoutParams[:len(withoutParams)-1]...)
 	runCmd = append(runCmd, params...)
@@ -82,10 +84,29 @@ func (f *FFmpeg) CreateClip(inputFile, outputFile, start, end string) error {
 	return nil
 }
 
-func (f *FFmpeg) PreviewCrop(w, h, x, y, videoFile string) error {
-	cropString := "crop=" + w + ":" + h + ":" + x + ":" + y
+func (f *FFmpeg) PreviewCrop(
+	w, h, x, y, cropClipStart, cropClipEnd, totalDuration, videoFile string,
+) error {
+	cropDimensions := internal.NewCropDimensions(w, h, x, y)
+	cropDuration := internal.NewCropDuration(cropClipStart, cropClipEnd, totalDuration)
+	clipDuration, err := cropDuration.Duration()
+	if err != nil {
+		return fmt.Errorf("Error parsing clip duration: %s", err)
+	}
+
 	go func() {
-		ffplayCmd := []string{"-loop", "0", "-vf", cropString, "-an", videoFile}
+		ffplayCmd := []string{
+			"-loop",
+			"0",
+			"-ss",
+			cropDuration.ClipStart(),
+			"-t",
+			fmt.Sprintf("%f", clipDuration),
+			"-vf",
+			cropDimensions.FilterString(),
+			"-an",
+			videoFile,
+		}
 		runtime.EventsEmit(*f.ctx, "ffmpeg-running", true)
 		fmt.Println("ffplay " + strings.Join(ffplayCmd, " "))
 		cmd := exec.Command("ffplay", ffplayCmd...)
@@ -104,12 +125,18 @@ func (f *FFmpeg) PreviewCrop(w, h, x, y, videoFile string) error {
 	return nil
 }
 
-func (f *FFmpeg) CreateCrop(inputFile, outputFile, w, h, x, y string) error {
-	params := f.GetParams()
+func (f *FFmpeg) CreateCrop(
+	inputFile, outputFile, w, h, x, y, cropClipStart, cropClipEnd, ffmpegParams string,
+) error {
+	params := strings.Split(ffmpegParams, " ")
 	withoutParams := []string{
 		"-y",
 		"-i",
 		inputFile,
+		"-ss",
+		cropClipStart,
+		"-to",
+		cropClipEnd,
 		"-vf",
 		"crop=" + w + ":" + h + ":" + x + ":" + y,
 		outputFile,
@@ -121,6 +148,7 @@ func (f *FFmpeg) CreateCrop(inputFile, outputFile, w, h, x, y string) error {
 	runCmd = append(runCmd, params...)
 	runCmd = append(runCmd, withoutParams[len(withoutParams)-3:]...)
 	runtime.LogDebug(*f.ctx, "Running ffmpeg "+strings.Join(runCmd, " "))
+
 	go func() {
 		runtime.EventsEmit(*f.ctx, "ffmpeg-running", true)
 		cmd := exec.Command("ffmpeg", runCmd...)

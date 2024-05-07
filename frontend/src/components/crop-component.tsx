@@ -18,6 +18,30 @@ export default function CropComponent({
   return (
     <div className="flex w-full flex-col items-center gap-4">
       <div className="flex w-full flex-col items-center gap-4">
+        <div className="flex w-full flex-col items-center gap-4">
+          <div className="flex w-full max-w-lg justify-center gap-4">
+            <InputWithLabel
+              label="Clip start"
+              value={state.cropClipStart || ""}
+              onChange={(e) =>
+                dispatch({ type: "setCropClipStart", payload: e.target.value })
+              }
+              disabled={!state.fileExists}
+              placeholder="clip start"
+              type="text"
+            />
+            <InputWithLabel
+              label="Clip end"
+              value={state.cropClipEnd || ""}
+              onChange={(e) =>
+                dispatch({ type: "setCropClipEnd", payload: e.target.value })
+              }
+              disabled={!state.fileExists}
+              placeholder="clip end"
+              type="text"
+            />
+          </div>
+        </div>
         <div className="flex w-full max-w-lg justify-center gap-4">
           <InputWithLabel
             label="X"
@@ -74,7 +98,16 @@ export default function CropComponent({
             const cropY = (state.cropY || 0).toString();
             const cropWidth = (state.cropWidth || state.width).toString();
             const cropHeight = (state.cropHeight || state.height).toString();
-            PreviewCrop(cropWidth, cropHeight, cropX, cropY, state.filename);
+            PreviewCrop(
+              cropWidth,
+              cropHeight,
+              cropX,
+              cropY,
+              state.cropClipStart,
+              state.cropClipEnd,
+              state.duration,
+              state.filename,
+            );
           }}
         >
           Preview
@@ -96,6 +129,9 @@ export default function CropComponent({
               cropHeight,
               cropX,
               cropY,
+              state.cropClipStart,
+              state.cropClipEnd,
+              state.ffmpegParams,
             );
           }}
         >
