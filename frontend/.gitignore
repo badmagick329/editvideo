@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# wails
+**/wailsjs
+**/package.json.md5
