@@ -3,6 +3,7 @@
 
 *.mp4
 *.webm
-build/
+build/*
+!build/appicon.png
 
 notes/
